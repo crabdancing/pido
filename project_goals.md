@@ -9,7 +9,8 @@ I want to implement, with the Perl language, a *complete* user interface for the
 2. Must be compatible with advanced usages. 
 	* For instance, `pacman -Qs test` will search the local (installed) package list for packages with `test` in their names or their descriptions. 
 	* Using `pacman -Qsq test` we can get a list of such packages *without any descriptions* and then, say, pass that to pacman for packages to remove, with `pacman -Rs $(pacman -Qsq)` (assuming a POSIX shell).
-	* To get full functionality for advanced users, all sub-flags must be compatible. Each function should be implemented on
+	* To get full functionality for advanced users, all sub-flags must be compatible.
+	
 3. This interface must be as fast as possible so that it can be feasibly used on extremely minimal systems, and should make as few assumptions as possible about available system utilities.
 	* Ideally, it should function just as well on a barebones Raspberry Pi Nano as it does on a desktop computer.
 	* Heavier languages like Python are of course excluded, and the program should wherever possible use minimal backends like `apt-get` and `apt-cache` instead of `apt`.
