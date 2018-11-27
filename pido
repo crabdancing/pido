@@ -1,0 +1,158 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptionsFromString);
+
+# Define the standard operations
+my $dbpath = '';
+my $verbose = '';
+my $arch = '';
+my $cachedir = '';
+my $color = '';
+my $config = '';
+my $debug = '';
+my $gpgdir = '';
+my $hookdir = '';
+my $logfile = '';
+my $noconfirm = '';
+my $confirm = '';
+my $disable_download_timeout = '';
+my $sysroot = '';
+
+my %standard_options = ( 
+    'dbpath|b=s' => \$dbpath,
+    'verbose|v' => \$verbose,
+    'arch=s' => \$arch,
+    # ...
+);
+
+# Define Database Options
+my $asdeps = '';
+my $asexplicit = '';
+my $check = '';
+my $quiet = '';
+
+my %database_options = (
+    'asdeps=s' =>\$asdeps,
+    'asexplicit=s' =>\$asexplicit,
+    'check|k' =>\$check,
+    'quiet|q' =>\$quiet,
+);
+
+# First option is the operation
+my $operation = shift;
+for my $arg (@ARGV) {
+    print("arg: ${arg}\n");
+}
+die("Missing operation") if( ! $operation );
+print("operation: ${operation}\n");
+GetOptionsFromString($operation, 
+		     'database|D' => \&database,
+		     'query|Q'    => \&query,
+		     'remove|R'   => \&remove,
+		     'sync|S'     => \&sync,
+		     'deptest|T'  => \&deptest,
+		     'files|F'    => \&files,
+		     'version|V'  => \&version,
+		     'help'       => \&help,
+) or die("Error in command line options");
+
+
+sub database {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("database: ${opt_name}, ${opt_value}\n");
+
+    my %opts = (%standard_options, %database_options);
+    GetOptions(%opts);
+    printStandardOptions();
+    printDatabaseOptions();
+}
+
+sub query {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("query: ${opt_name}, ${opt_value}\n");
+}
+
+sub remove {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("remove: ${opt_name}, ${opt_value}\n");
+}
+
+sub sync {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("sync: ${opt_name}, ${opt_value}\n");
+}
+
+sub deptest {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("deptest: ${opt_name}, ${opt_value}\n");
+}
+
+sub upgrade {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("upgrade: ${opt_name}, ${opt_value}\n");
+}
+
+sub files {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("files: ${opt_name}, ${opt_value}\n");
+}
+
+sub version {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("version: ${opt_name}, ${opt_value}\n");
+}
+
+sub help {
+    my ($opt_name, $opt_value) = $@;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("help: ${opt_name}, ${opt_value}\n");
+}
+
+sub printStandardOptions {
+    print("Standard Options\n");
+    print("dbpath: ${dbpath}\n");
+    print("verbose: ${verbose}\n");
+    print("arch: ${arch}\n");
+    print("cachedir: ${cachedir}\n");
+    print("color: ${color}\n");
+    print("config: ${config}\n");
+    print("debug: ${debug}\n");
+    print("gpgdir: ${gpgdir}\n");
+    print("hookdir: ${hookdir}\n");
+    print("logfile: ${logfile}\n");
+    print("noconfirm: ${noconfirm}\n");
+    print("confirm: ${confirm}\n");
+    print("disable_download_timeout: ${disable_download_timeout}\n");
+    print("sysroot: ${sysroot}\n");
+}
+
+sub printDatabaseOptions {
+    print("Database Options\n");
+    print("asdeps: ${asdeps}\n");
+    print("asexplicit: ${asexplicit}\n");
+    print("check: ${check}\n");
+    print("quiet: ${quiet}\n");
+}
+
+#(fset 'print-variable
+#   [?  ?  ?  ?  ?p ?r ?i ?n ?t ?\( ?\" right ?\C-k left ?Y backspace ?\C-y ?: ?  ?\C-e ?\{ ?\C-y ?\} ?\\ ?n ?\" ?\) ?\; right])
