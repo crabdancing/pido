@@ -2,9 +2,18 @@
 
 export PIDO='./pido'
 
-$PIDO --database --dbpath here -b there -v --arch pretty
+export TRANSACTION_OPTIONS='-D'
+#$PIDO --database --dbpath here -b there -v --arch pretty
 
-#exit
+
+$PIDO -Dkq --asdeps p1 --asexplicit p2
+$PIDO -Qcdegiklmnpqtu -o dog -s oops 
+$PIDO -Scgilquwy -s oops
+$PIDO -
+exit
+
+
+test/query.exp
 
 echo "Test string operations"
 $PIDO --database

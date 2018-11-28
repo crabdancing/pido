@@ -3,10 +3,11 @@
 use strict;
 use warnings;
 
-use Getopt::Long qw(GetOptionsFromString);
+use Data::Dumper;
 
-my %option_hash = ();
+use Getopt::Long qw(:config no_ignore_case bundling);
 
+# Define the operations
 my %operations = (
 'database|D' => \&database,
 'query|Q'    => \&query,
@@ -18,7 +19,7 @@ my %operations = (
 'help'       => \&help,
     );
 
-# Define the standard operations
+# Define the Standard Options
 my @standard_options = (
     'dbpath|b=s',
     'verbose|v',
@@ -36,46 +37,75 @@ my @standard_options = (
     'sysroot=s',
     );
 
-my %standard_options = ();
-for my $key (@standard_options) {
-    $standard_options{$key} = undef;
-}
+# Define Database Options
+my @database_options = (
+    'asdeps=s',
+    'asexplicit=s',
+    'check|k',
+    'quiet|q',
+    );
 
-GetOptions(\%option_hash, @standard_options);
+# Define the Query Options
+my @query_options = (
+'changelog|c',
+'deps|d',
+'explicit|e',
+'groups|g',
+'info|i',
+'check|k',
+'list|l',
+'foreign|m',
+'native|n',
+'owns|o=s',
+'file|p',
+'quiet|q',
+'search|s=s',
+'unrequired|t',
+'upgrades|u',
+    );
 
+# Define the Sync Options
+my @sync_options = (
+'clean',
+'groups',
+'info',
+'list',
+'quiet',
+'search=s',
+'sysupgrade|u',
+'downloadonly|w',
+'refresh|y',
+    );
+
+#
+# Get Options
+#
+
+my %option_hash = ();
+
+GetOptions(\%option_hash, %operations, 
+	   @standard_options,
+	   @database_options,
+	   @query_options,
+	   @sync_options
+    );
+
+if(1) {
+print Dumper(\%option_hash);
+} else {
 print("Options Found\n");
 for my $key (keys %option_hash ) {
     print("$key");
     print(": $option_hash{$key}") if( defined $option_hash{$key} );
     print("\n");
 }
-
-
-# Define Database Options
-my $asdeps = '';
-my $asexplicit = '';
-my $check = '';
-my $quiet = '';
-
-my %database_options = (
-    'asdeps=s' =>\$asdeps,
-    'asexplicit=s' =>\$asexplicit,
-    'check|k' =>\$check,
-    'quiet|q' =>\$quiet,
-);
-
-
+}
 
 sub database {
     my ($opt_name, $opt_value) = $@;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("database: ${opt_name}, ${opt_value}\n");
-
-    #my %opts = (%standard_options, %database_options);
-    #GetOptions(%opts);
-    #printStandardOptions();
-    #printDatabaseOptions();
 }
 
 sub query {
@@ -134,31 +164,6 @@ sub help {
     print("help: ${opt_name}, ${opt_value}\n");
 }
 
-sub printStandardOptions {
-    # print("Standard Options\n");
-    # print("dbpath: ${dbpath}\n");
-    # print("verbose: ${verbose}\n");
-    # print("arch: ${arch}\n");
-    # print("cachedir: ${cachedir}\n");
-    # print("color: ${color}\n");
-    # print("config: ${config}\n");
-    # print("debug: ${debug}\n");
-    # print("gpgdir: ${gpgdir}\n");
-    # print("hookdir: ${hookdir}\n");
-    # print("logfile: ${logfile}\n");
-    # print("noconfirm: ${noconfirm}\n");
-    # print("confirm: ${confirm}\n");
-    # print("disable_download_timeout: ${disable_download_timeout}\n");
-    # print("sysroot: ${sysroot}\n");
-}
-
-sub printDatabaseOptions {
-    print("Database Options\n");
-    print("asdeps: ${asdeps}\n");
-    print("asexplicit: ${asexplicit}\n");
-    print("check: ${check}\n");
-    print("quiet: ${quiet}\n");
-}
 
 #(fset 'print-variable
 #   [?  ?  ?  ?  ?p ?r ?i ?n ?t ?\( ?\" right ?\C-k left ?Y backspace ?\C-y ?: ?  ?\C-e ?\{ ?\C-y ?\} ?\\ ?n ?\" ?\) ?\; right])
