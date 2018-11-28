@@ -5,28 +5,51 @@ use warnings;
 
 use Getopt::Long qw(GetOptionsFromString);
 
-# Define the standard operations
-my $dbpath = '';
-my $verbose = '';
-my $arch = '';
-my $cachedir = '';
-my $color = '';
-my $config = '';
-my $debug = '';
-my $gpgdir = '';
-my $hookdir = '';
-my $logfile = '';
-my $noconfirm = '';
-my $confirm = '';
-my $disable_download_timeout = '';
-my $sysroot = '';
+my %option_hash = ();
 
-my %standard_options = ( 
-    'dbpath|b=s' => \$dbpath,
-    'verbose|v' => \$verbose,
-    'arch=s' => \$arch,
-    # ...
-);
+my %operations = (
+'database|D' => \&database,
+'query|Q'    => \&query,
+'remove|R'   => \&remove,
+'sync|S'     => \&sync,
+'deptest|T'  => \&deptest,
+'files|F'    => \&files,
+'version|V'  => \&version,
+'help'       => \&help,
+    );
+
+# Define the standard operations
+my @standard_options = (
+    'dbpath|b=s',
+    'verbose|v',
+    'arch=s',
+    'cachedir=s',
+    'color=s',
+    'config',
+    'debug',
+    'gpgdir=s',
+    'hookdir=s',
+    'logfile=s',
+    'noconfirm',
+    'confirm',
+    'disable_download_timeout',
+    'sysroot=s',
+    );
+
+my %standard_options = ();
+for my $key (@standard_options) {
+    $standard_options{$key} = undef;
+}
+
+GetOptions(\%option_hash, @standard_options);
+
+print("Options Found\n");
+for my $key (keys %option_hash ) {
+    print("$key");
+    print(": $option_hash{$key}") if( defined $option_hash{$key} );
+    print("\n");
+}
+
 
 # Define Database Options
 my $asdeps = '';
@@ -41,23 +64,6 @@ my %database_options = (
     'quiet|q' =>\$quiet,
 );
 
-# First option is the operation
-my $operation = shift;
-for my $arg (@ARGV) {
-    print("arg: ${arg}\n");
-}
-die("Missing operation") if( ! $operation );
-print("operation: ${operation}\n");
-GetOptionsFromString($operation, 
-		     'database|D' => \&database,
-		     'query|Q'    => \&query,
-		     'remove|R'   => \&remove,
-		     'sync|S'     => \&sync,
-		     'deptest|T'  => \&deptest,
-		     'files|F'    => \&files,
-		     'version|V'  => \&version,
-		     'help'       => \&help,
-) or die("Error in command line options");
 
 
 sub database {
@@ -66,10 +72,10 @@ sub database {
     $opt_value = 'undef' if( ! defined $opt_value );
     print("database: ${opt_name}, ${opt_value}\n");
 
-    my %opts = (%standard_options, %database_options);
-    GetOptions(%opts);
-    printStandardOptions();
-    printDatabaseOptions();
+    #my %opts = (%standard_options, %database_options);
+    #GetOptions(%opts);
+    #printStandardOptions();
+    #printDatabaseOptions();
 }
 
 sub query {
@@ -129,21 +135,21 @@ sub help {
 }
 
 sub printStandardOptions {
-    print("Standard Options\n");
-    print("dbpath: ${dbpath}\n");
-    print("verbose: ${verbose}\n");
-    print("arch: ${arch}\n");
-    print("cachedir: ${cachedir}\n");
-    print("color: ${color}\n");
-    print("config: ${config}\n");
-    print("debug: ${debug}\n");
-    print("gpgdir: ${gpgdir}\n");
-    print("hookdir: ${hookdir}\n");
-    print("logfile: ${logfile}\n");
-    print("noconfirm: ${noconfirm}\n");
-    print("confirm: ${confirm}\n");
-    print("disable_download_timeout: ${disable_download_timeout}\n");
-    print("sysroot: ${sysroot}\n");
+    # print("Standard Options\n");
+    # print("dbpath: ${dbpath}\n");
+    # print("verbose: ${verbose}\n");
+    # print("arch: ${arch}\n");
+    # print("cachedir: ${cachedir}\n");
+    # print("color: ${color}\n");
+    # print("config: ${config}\n");
+    # print("debug: ${debug}\n");
+    # print("gpgdir: ${gpgdir}\n");
+    # print("hookdir: ${hookdir}\n");
+    # print("logfile: ${logfile}\n");
+    # print("noconfirm: ${noconfirm}\n");
+    # print("confirm: ${confirm}\n");
+    # print("disable_download_timeout: ${disable_download_timeout}\n");
+    # print("sysroot: ${sysroot}\n");
 }
 
 sub printDatabaseOptions {
@@ -156,3 +162,40 @@ sub printDatabaseOptions {
 
 #(fset 'print-variable
 #   [?  ?  ?  ?  ?p ?r ?i ?n ?t ?\( ?\" right ?\C-k left ?Y backspace ?\C-y ?: ?  ?\C-e ?\{ ?\C-y ?\} ?\\ ?n ?\" ?\) ?\; right])
+
+# Getopt::Long encourages the use of Pod::Usage to produce help messages. For example:
+
+__END__
+
+=head1 NAME
+
+sample - Using Getopt::Long and Pod::Usage
+
+=head1 SYNOPSIS
+
+sample [options] [file ...]
+
+ Options:
+   -help            brief help message
+   -man             full documentation
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the given input file(s) and do something
+useful with the contents thereof.
+
+=cut

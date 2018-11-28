@@ -2,6 +2,10 @@
 
 export PIDO='./pido'
 
+$PIDO --database --dbpath here -b there -v --arch pretty
+
+#exit
+
 echo "Test string operations"
 $PIDO --database
 $PIDO --query
