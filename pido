@@ -16,6 +16,11 @@ use Pod::Usage;
 
 #------------------------------------------------------------------------
 
+my $debug = undef;
+
+#------------------------------------------------------------------------
+# Define the command line options for GetOpt::Long
+
 # Define the operations
 my %operations = (
     'database|D' => \&database,
@@ -101,19 +106,34 @@ my @sync_options = (
 # Define Transaction Options (apply to -S, -R, and -U)
 my @transaction_options = (
     'nodeps|d',
-    'assume_installed=s',
+    'assume-installed=s',
     'dbonly',
     'noprogressbar',
     'noscriptlet',
     'print|p',
-    'print_format=s',
+    'print-format=s',
     );
+
+# Define Upgrade Options (apply to -S and -U)
+my @upgrade_options = (
+'asdeps',
+'asexplicit',
+'ignore=s',
+'ignoregroup=s',
+'needed',
+'overwrite=s',
+    );
+
+#------------------------------------------------------------------------
+
+print "------------------------------------------------------------------------------\n";
+print "@ARGV\n";
 
 #------------------------------------------------------------------------
 # Save a copy of the command line
 
 my @command_line = @ARGV;
-print "command_line:\n", Dumper \@command_line;
+print "command_line:\n", Dumper \@command_line if($debug);
 
 #------------------------------------------------------------------------
 # Define Globals
@@ -135,15 +155,15 @@ $p->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
 $p->getoptions(%operations);
 die "Operation not given." if( ! defined $operation );
 
-print "\@ARGV:\n", Dumper(\@ARGV);
+print "\@ARGV:\n", Dumper(\@ARGV) if($debug);
 
 #------------------------------------------------------------------------
 # Get Options
 
 my $o = Getopt::Long::Parser->new;
-$o->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
+#$o->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
+$o->configure( 'no_ignore_case', 'bundling', 'no_auto_abbrev' );
 $o->getoptions(\%option_hash, @options);
-#GetOptions(\%option_hash, %operations, @standard_options, @sync_options);
 
 if(1) {
     print "option_hash:\n", Dumper(\%option_hash);
@@ -166,6 +186,7 @@ if(1) {
 exit(0);
 
 #------------------------------------------------------------------------
+# Utility functions
 
 sub print_values {
     my ($opt_name, $opt_value) = @_;
@@ -173,6 +194,8 @@ sub print_values {
     $opt_value = 'undef' if( ! defined $opt_value );
     print("${opt_name}, ${opt_value}\n");
 }
+
+#------------------------------------------------------------------------
 
 sub database {
     print_values(@_);
@@ -195,16 +218,23 @@ sub do_query {
 }
 
 sub remove {
+    print_values(@_);
     my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("remove: ${opt_name}, ${opt_value}\n");
 }
 
+sub do_remove {
+    print "do_remove()\n";
+}
+
 sub sync {
     print_values(@_);
     $operation = \&do_sync;
     push(@options, @sync_options);
+    push(@options, @transaction_options);
+    push(@options, @upgrade_options);
 }
 
 sub do_sync {
@@ -218,25 +248,32 @@ sub deptest {
     print("deptest: ${opt_name}, ${opt_value}\n");
 }
 
+sub do_deptest {
+}
+
 sub upgrade {
+    print_values(@_);
     my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("upgrade: ${opt_name}, ${opt_value}\n");
 }
 
+sub do_upgrade {
+}
+
 sub files {
-    my ($opt_name, $opt_value) = @_;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("files: ${opt_name}, ${opt_value}\n");
+    print_values(@_);
+}
+
+sub do_files {
 }
 
 sub version {
-    my ($opt_name, $opt_value) = @_;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("version: ${opt_name}, ${opt_value}\n");
+    print_values(@_);
+}
+
+sub do_version {
 }
 
 sub help {

@@ -8,7 +8,11 @@ export TRANSACTION_OPTIONS='-D'
 $PIDO --help
 $PIDO -Dkq --asdeps p1 --asexplicit p2 t1 t2
 $PIDO -Qcdegiklmnpqtu -o dog -s oops t1 
-$PIDO -Scgilquwy -s oops t1 t2
+$PIDO -Scgilquwyd -s oops t1 t2
+$PIDO --sync --nodeps --assume-installed p=v2 --dbonly --noprogressbar --noscriptlet --print --print-format "%d" t1
+$PIDO --sync --asdeps --asexplicit --ignore p1 --ignoregroup p2 --needed --overwrite glob* t1 t2
+$PIDO -Sps oops
+$PIDO -Sps
 $PIDO - t1 t2 t3
 exit
 
