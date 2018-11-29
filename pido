@@ -90,6 +90,14 @@ my @query_options = (
     'upgrades|u',
     );
 
+# Define Remove Options (apply to -R)
+my @remove_options = (
+'cascade|c',
+'nosave|n',
+'recursive|s',
+'unneeded|u',
+    );
+
 # Define the Sync Options
 my @sync_options = (
     'clean|c',
@@ -100,7 +108,7 @@ my @sync_options = (
     'search|s=s',
     'sysupgrade|u',
     'downloadonly|w',
-    'refresh|y',
+    'refresh|y+',
     );
 
 # Define Transaction Options (apply to -S, -R, and -U)
@@ -122,6 +130,17 @@ my @upgrade_options = (
 'ignoregroup=s',
 'needed',
 'overwrite=s',
+    );
+
+# Define File Options (apply to -F)
+my @file_options = (
+'refresh|y',
+'list|l',
+'search|s',
+'regex|x',
+'owns|o',
+'quiet|q',
+'machinereadable',
     );
 
 #------------------------------------------------------------------------
@@ -219,10 +238,9 @@ sub do_query {
 
 sub remove {
     print_values(@_);
-    my ($opt_name, $opt_value) = @_;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("remove: ${opt_name}, ${opt_value}\n");
+    $operation = \&do_remove;
+    push(@options, @remove_options);
+    push(@options, @transaction_options);
 }
 
 sub do_remove {
@@ -243,37 +261,41 @@ sub do_sync {
 
 sub deptest {
     my ($opt_name, $opt_value) = @_;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("deptest: ${opt_name}, ${opt_value}\n");
+    $operation = \&do_deptest;
 }
 
 sub do_deptest {
+    print "do_deptest()\n";
 }
 
 sub upgrade {
     print_values(@_);
-    my ($opt_name, $opt_value) = @_;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("upgrade: ${opt_name}, ${opt_value}\n");
+    $operation = \&do_upgrade;
+    push(@options, @upgrade_options);
+    push(@options, @transaction_options);
 }
 
 sub do_upgrade {
+    print "do_upgrade()\n";
 }
 
 sub files {
     print_values(@_);
+    $operation = \&do_files;
+    push(@options, @file_options);
 }
 
 sub do_files {
+    print "do_files()\n";
 }
 
 sub version {
     print_values(@_);
+    $operation = \&do_version;
 }
 
 sub do_version {
+    print "do_version()\n";
 }
 
 sub help {
