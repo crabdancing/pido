@@ -5,11 +5,11 @@ export PIDO='./pido'
 export TRANSACTION_OPTIONS='-D'
 #$PIDO --database --dbpath here -b there -v --arch pretty
 
-
-$PIDO -Dkq --asdeps p1 --asexplicit p2
-$PIDO -Qcdegiklmnpqtu -o dog -s oops 
-$PIDO -Scgilquwy -s oops
-$PIDO -
+$PIDO --help
+$PIDO -Dkq --asdeps p1 --asexplicit p2 t1 t2
+$PIDO -Qcdegiklmnpqtu -o dog -s oops t1 
+$PIDO -Scgilquwy -s oops t1 t2
+$PIDO - t1 t2 t3
 exit
 
 

@@ -1,22 +1,43 @@
 #!/usr/bin/perl
+#! -*- perl -*-
+
+#
+# Author: Cassie E Nicol cassieenicol@gmail.com
+#
 
 use strict;
 use warnings;
 
 use Data::Dumper;
 
-use Getopt::Long qw(:config no_ignore_case bundling);
+use Getopt::Long qw(:config no_ignore_case bundling pass_through no_auto_abbrev );
+
+use Pod::Usage;
+
+#------------------------------------------------------------------------
 
 # Define the operations
 my %operations = (
-'database|D' => \&database,
-'query|Q'    => \&query,
-'remove|R'   => \&remove,
-'sync|S'     => \&sync,
-'deptest|T'  => \&deptest,
-'files|F'    => \&files,
-'version|V'  => \&version,
-'help'       => \&help,
+    'database|D' => \&database,
+    'query|Q'    => \&query,
+    'remove|R'   => \&remove,
+    'sync|S'     => \&sync,
+    'deptest|T'  => \&deptest,
+    'files|F'    => \&files,
+    'version|V'  => \&version,
+    'help'       => \&help,
+    );
+
+# Define the Operation Options (not used)
+my %operation_options = (
+    'database|D',
+    'query|Q',
+    'remove|R',
+    'sync|S',
+    'deptest|T',
+    'files|F',
+    'version|V',
+    'help',
     );
 
 # Define the Standard Options
@@ -47,123 +68,186 @@ my @database_options = (
 
 # Define the Query Options
 my @query_options = (
-'changelog|c',
-'deps|d',
-'explicit|e',
-'groups|g',
-'info|i',
-'check|k',
-'list|l',
-'foreign|m',
-'native|n',
-'owns|o=s',
-'file|p',
-'quiet|q',
-'search|s=s',
-'unrequired|t',
-'upgrades|u',
+    'changelog|c',
+    'deps|d',
+    'explicit|e',
+    'groups|g',
+    'info|i',
+    'check|k',
+    'list|l',
+    'foreign|m',
+    'native|n',
+    'owns|o=s',
+    'file|p',
+    'quiet|q',
+    'search|s=s',
+    'unrequired|t',
+    'upgrades|u',
     );
 
 # Define the Sync Options
 my @sync_options = (
-'clean',
-'groups',
-'info',
-'list',
-'quiet',
-'search=s',
-'sysupgrade|u',
-'downloadonly|w',
-'refresh|y',
+    'clean|c',
+    'groups|g',
+    'info|i',
+    'list|l',
+    'quiet|q',
+    'search|s=s',
+    'sysupgrade|u',
+    'downloadonly|w',
+    'refresh|y',
     );
 
-#
-# Get Options
-#
+# Define Transaction Options (apply to -S, -R, and -U)
+my @transaction_options = (
+    'nodeps|d',
+    'assume_installed=s',
+    'dbonly',
+    'noprogressbar',
+    'noscriptlet',
+    'print|p',
+    'print_format=s',
+    );
 
+#------------------------------------------------------------------------
+# Save a copy of the command line
+
+my @command_line = @ARGV;
+print "command_line:\n", Dumper \@command_line;
+
+#------------------------------------------------------------------------
+# Define Globals
+
+# Operation to execute
+my $operation;
+
+# Options to use based upon the operation
+my @options = @standard_options;
+
+# Options found    
 my %option_hash = ();
 
-GetOptions(\%option_hash, %operations, 
-	   @standard_options,
-	   @database_options,
-	   @query_options,
-	   @sync_options
-    );
+#------------------------------------------------------------------------
+# Determine the Operation
+
+my $p = Getopt::Long::Parser->new;
+$p->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
+$p->getoptions(%operations);
+die "Operation not given." if( ! defined $operation );
+
+print "\@ARGV:\n", Dumper(\@ARGV);
+
+#------------------------------------------------------------------------
+# Get Options
+
+my $o = Getopt::Long::Parser->new;
+$o->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
+$o->getoptions(\%option_hash, @options);
+#GetOptions(\%option_hash, %operations, @standard_options, @sync_options);
 
 if(1) {
-print Dumper(\%option_hash);
+    print "option_hash:\n", Dumper(\%option_hash);
+    #print Data::Dumper->Dump([%option_hash], [qw(option_hash)]);
+    print "Argv(targets):\n", Dumper(\@ARGV);
 } else {
-print("Options Found\n");
-for my $key (keys %option_hash ) {
-    print("$key");
-    print(": $option_hash{$key}") if( defined $option_hash{$key} );
-    print("\n");
+    print("Options Found\n");
+    for my $key (keys %option_hash ) {
+	print("$key");
+	print(": $option_hash{$key}") if( defined $option_hash{$key} );
+	print("\n");
+    }
 }
+
+#------------------------------------------------------------------------
+# Run operation
+
+&{$operation}();
+
+exit(0);
+
+#------------------------------------------------------------------------
+
+sub print_values {
+    my ($opt_name, $opt_value) = @_;
+    $opt_name = 'undef' if( ! defined $opt_name );
+    $opt_value = 'undef' if( ! defined $opt_value );
+    print("${opt_name}, ${opt_value}\n");
 }
 
 sub database {
-    my ($opt_name, $opt_value) = $@;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("database: ${opt_name}, ${opt_value}\n");
+    print_values(@_);
+    $operation = \&do_database;
+    push(@options, @database_options);
+}
+
+sub do_database {
+    print("do_database()\n");
 }
 
 sub query {
-    my ($opt_name, $opt_value) = $@;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("query: ${opt_name}, ${opt_value}\n");
+    print_values(@_);
+    $operation = \&do_query;
+    push(@options, @query_options);
+}
+
+sub do_query {
+    print("do_query()\n");
 }
 
 sub remove {
-    my ($opt_name, $opt_value) = $@;
+    my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("remove: ${opt_name}, ${opt_value}\n");
 }
 
 sub sync {
-    my ($opt_name, $opt_value) = $@;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("sync: ${opt_name}, ${opt_value}\n");
+    print_values(@_);
+    $operation = \&do_sync;
+    push(@options, @sync_options);
+}
+
+sub do_sync {
+    print("do_sync()\n");
 }
 
 sub deptest {
-    my ($opt_name, $opt_value) = $@;
+    my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("deptest: ${opt_name}, ${opt_value}\n");
 }
 
 sub upgrade {
-    my ($opt_name, $opt_value) = $@;
+    my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("upgrade: ${opt_name}, ${opt_value}\n");
 }
 
 sub files {
-    my ($opt_name, $opt_value) = $@;
+    my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("files: ${opt_name}, ${opt_value}\n");
 }
 
 sub version {
-    my ($opt_name, $opt_value) = $@;
+    my ($opt_name, $opt_value) = @_;
     $opt_name = 'undef' if( ! defined $opt_name );
     $opt_value = 'undef' if( ! defined $opt_value );
     print("version: ${opt_name}, ${opt_value}\n");
 }
 
 sub help {
-    my ($opt_name, $opt_value) = $@;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("help: ${opt_name}, ${opt_value}\n");
+    print_values(@_);
+    $operation = \&do_help;
+    #%options = (%options, @help_options);
 }
 
+sub do_help {
+    pod2usage(1);
+}
 
 #(fset 'print-variable
 #   [?  ?  ?  ?  ?p ?r ?i ?n ?t ?\( ?\" right ?\C-k left ?Y backspace ?\C-y ?: ?  ?\C-e ?\{ ?\C-y ?\} ?\\ ?n ?\" ?\) ?\; right])
