@@ -166,9 +166,9 @@ $o->configure( 'no_ignore_case', 'bundling', 'no_auto_abbrev' );
 $o->getoptions(\%option_hash, @options);
 
 if(1) {
-    print "option_hash:\n", Dumper(\%option_hash);
-    #print Data::Dumper->Dump([%option_hash], [qw(option_hash)]);
-    print "Argv(targets):\n", Dumper(\@ARGV);
+    #print "option_hash:\n", Dumper(\%option_hash);
+    print Data::Dumper->Dump([\%option_hash], [qw(*option_hash)]);
+    print Data::Dumper->Dump([\@ARGV], ['*argv']);
 } else {
     print("Options Found\n");
     for my $key (keys %option_hash ) {
