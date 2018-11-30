@@ -4,7 +4,9 @@
 #
 # Author: Cassie E Nicol cassieenicol@gmail.com
 #
-
+# An Arch Linux Live CD can be downloaded here for testing
+# https://www.archlinux.org/download/
+    
 use strict;
 use warnings;
 
@@ -124,29 +126,30 @@ my @transaction_options = (
 
 # Define Upgrade Options (apply to -S and -U)
 my @upgrade_options = (
-'asdeps',
-'asexplicit',
-'ignore=s',
-'ignoregroup=s',
-'needed',
-'overwrite=s',
+    'asdeps',
+    'asexplicit',
+    'ignore=s',
+    'ignoregroup=s',
+    'needed',
+    'overwrite=s',
     );
 
 # Define File Options (apply to -F)
 my @file_options = (
-'refresh|y',
-'list|l',
-'search|s',
-'regex|x',
-'owns|o',
-'quiet|q',
-'machinereadable',
+    'refresh|y',
+    'list|l',
+    'search|s',
+    'regex|x',
+    'owns|o',
+    'quiet|q',
+    'machinereadable',
     );
 
 #------------------------------------------------------------------------
+# Debug to show on console a bar of dashes when the app starts.
 
 print "------------------------------------------------------------------------------\n";
-print "@ARGV\n";
+print "$0 @ARGV\n";
 
 #------------------------------------------------------------------------
 # Save a copy of the command line
