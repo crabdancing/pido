@@ -31,7 +31,7 @@ my $debug = undef;
 
 # Define the operations
 my %operations = (
-    'database|D' => \&dat>abase,
+    'database|D' => \&database,
     'query|Q'    => \&query,
     'remove|R'   => \&remove,
     'sync|S'     => \&sync,
