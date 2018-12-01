@@ -51,7 +51,7 @@ my @standard_options = (
     'arch=s',
     'cachedir=s@',
     'color=s',
-    'config',
+    'config=s',
     'debug',
     'gpgdir=s',
     'hookdir=s@',
@@ -87,7 +87,7 @@ my @query_options = (
     'owns|o=s',
     'file|p',
     'quiet|q',
-    'search|s=s',
+    'search|s:s@',
     'unrequired|t',
     'upgrades|u',
     );
@@ -107,7 +107,7 @@ my @sync_options = (
     'info|i+',
     'list|l',
     'quiet|q',
-    'search|s=s@',
+    'search|s:s@',
     'sysupgrade|u',
     'downloadonly|w',
     'refresh|y+',
@@ -259,6 +259,8 @@ sub query {
 
 sub do_query {
     print("do_query()\n");
+    $a = new Apt;
+    $a->query(\%option_hash, \@ARGV);
 }
 
 sub remove {
