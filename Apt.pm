@@ -26,28 +26,38 @@ sub new {
 sub _initialize {
 }
 
-sub print_options {
-   # my $options = @_;
-   # my @keys = keys %options;
-   # print Data::Dumper->Dump( [\@keys], [qw(keys)] );
+sub print_args {
+    my ($options, $targets) = @_;
+    print Data::Dumper->Dump( [$options], [qw(options)] );
+    print Data::Dumper->Dump( [$targets], [qw(targets)] );
 }
 
 sub sync {
     my ($self, $options, $targets) = @_;
-    print Data::Dumper->Dump( [$options, $targets], [qw(args targets)] );
-    #print_options($options);
+    print_args($options, $targets);
+    my $result = 0;
+    print "Not implemented\n";
+    return $result;
 
     my $pattern = $options->{search};
     my $cmd = "apt-cache search $pattern";
     print "pattern: ${pattern}\n";
     print "cmd: ${cmd}\n";
     
-    my $result = `$cmd`;
+    $result = `$cmd`;
     print "$cmd\n$result\n\n";
+
+    return $result;
 }
 
 sub query {
-
+    my ($self, $options, $targets) = @_;
+    print_args($options, $targets);
+    my $result = 0;
+    
+    print "Not implemented\n";
+    
+    return $result;
 }
 
 1;

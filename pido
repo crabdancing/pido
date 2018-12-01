@@ -25,13 +25,14 @@ use Apt;
 #------------------------------------------------------------------------
 
 my $debug = undef;
+#$debug = 1;
 
 #------------------------------------------------------------------------
 # Define the command line options for GetOpt::Long
 
 # Define the operations
 my %operations = (
-    'database|D' => \&dat>abase,
+    'database|D' => \&database,
     'query|Q'    => \&query,
     'remove|R'   => \&remove,
     'sync|S'     => \&sync,
@@ -152,13 +153,13 @@ my @file_options = (
 # Save a copy of the command line
 
 my @command_line = @ARGV;
-print "command_line:\n", Dumper \@command_line if($debug);
+print Data::Dumper->Dump( [\@command_line], ['*command_line']) if($debug);
 
 #------------------------------------------------------------------------
 # Define Globals
 
 # Operation to execute
-my $operation;
+my $operation = undef;
 
 # Options to use based upon the operation
 my @options = @standard_options;
@@ -171,19 +172,20 @@ my %option_hash = ();
 
 my $p = Getopt::Long::Parser->new;
 $p->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
-$p->getoptions(%operations);
+$p->getoptions(%operations) or die("no operation found");
 die "Operation not given." if( ! defined $operation );
 
-print "\@ARGV:\n", Dumper(\@ARGV) if($debug);
+print "After operation parse:\n", Data::Dumper->Dump([\@ARGV], ['*ARGV']) if($debug);
 
 #------------------------------------------------------------------------
 # Get Options
 
 my $o = Getopt::Long::Parser->new;
 $o->configure( 'no_ignore_case', 'bundling', 'no_auto_abbrev' );
-$o->getoptions(\%option_hash, @options);
+$o->getoptions(\%option_hash, @options) or die("trying");
 
 if($debug) {
+    print "After option parse:\n";
     if(1) {
 	print Data::Dumper->Dump([\%option_hash], [qw(*option_hash)]);
 	print Data::Dumper->Dump([\@ARGV], ['*argv']);
@@ -200,25 +202,39 @@ if($debug) {
 #------------------------------------------------------------------------
 # Run operation
 
+print "Running operation:" if($debug);
 my $result = &{$operation}();
-
+print "result: ${result}\n";
+    
 exit($result);
 
 #------------------------------------------------------------------------
 # Utility functions
 
 sub print_values {
-    my ($opt_name, $opt_value) = @_;
-    $opt_name = 'undef' if( ! defined $opt_name );
-    $opt_value = 'undef' if( ! defined $opt_value );
-    print("${opt_name}, ${opt_value}\n");
+    if($debug) {
+	my ($opt_name, $opt_value) = @_;
+	$opt_name = 'undef' if( ! defined $opt_name );
+	$opt_value = 'undef' if( ! defined $opt_value );
+	print("${opt_name}, ${opt_value}\n");
+    }
 }
 
+sub assign_operation {
+    my $callback = shift(@_);
+    if( defined $operation ) {
+	print "Only one operation allowed\n";
+	exit(1);
+    } else {
+	$operation = $callback;
+    }
+}
+    
 #------------------------------------------------------------------------
 
 sub database {
     print_values(@_);
-    $operation = \&do_database;
+    assign_operation( \&do_database );
     push(@options, @database_options);
 }
 
@@ -228,7 +244,7 @@ sub do_database {
 
 sub query {
     print_values(@_);
-    $operation = \&do_query;
+    assign_operation( \&do_query );
     push(@options, @query_options);
 }
 
@@ -238,7 +254,7 @@ sub do_query {
 
 sub remove {
     print_values(@_);
-    $operation = \&do_remove;
+    assign_operation( \&do_remove );
     push(@options, @remove_options);
     push(@options, @transaction_options);
 }
@@ -249,7 +265,7 @@ sub do_remove {
 
 sub sync {
     print_values(@_);
-    $operation = \&do_sync;
+    assign_operation( \&do_sync );
     push(@options, @sync_options);
     push(@options, @transaction_options);
     push(@options, @upgrade_options);
@@ -263,7 +279,7 @@ sub do_sync {
 
 sub deptest {
     my ($opt_name, $opt_value) = @_;
-    $operation = \&do_deptest;
+    assign_operation( \&do_deptest );
 }
 
 sub do_deptest {
@@ -272,7 +288,7 @@ sub do_deptest {
 
 sub upgrade {
     print_values(@_);
-    $operation = \&do_upgrade;
+    assign_operation( \&do_upgrade );
     push(@options, @upgrade_options);
     push(@options, @transaction_options);
 }
@@ -283,7 +299,7 @@ sub do_upgrade {
 
 sub files {
     print_values(@_);
-    $operation = \&do_files;
+    assign_operation( \&do_files );
     push(@options, @file_options);
 }
 
@@ -293,7 +309,7 @@ sub do_files {
 
 sub version {
     print_values(@_);
-    $operation = \&do_version;
+    assign_operation( \&do_version );
 }
 
 sub do_version {
@@ -302,7 +318,7 @@ sub do_version {
 
 sub help {
     print_values(@_);
-    $operation = \&do_help;
+    assign_operation( \&do_help );
     #%options = (%options, @help_options);
 }
 
