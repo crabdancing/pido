@@ -10,11 +10,15 @@
 use strict;
 use warnings;
 
+BEGIN { unshift @INC, '.'; }
+
 use Data::Dumper;
 
 use Getopt::Long qw(:config no_ignore_case bundling pass_through no_auto_abbrev );
 
 use Pod::Usage;
+
+use Apt;
 
 #------------------------------------------------------------------------
 
@@ -63,6 +67,7 @@ my @standard_options = (
     'confirm',
     'disable_download_timeout',
     'sysroot=s',
+    'dry-run|n',
     );
 
 # Define Database Options
@@ -260,6 +265,8 @@ sub sync {
 
 sub do_sync {
     print("do_sync()\n");
+    $a = new Apt;
+    $a->sync(\%option_hash, \@ARGV);
 }
 
 sub deptest {
