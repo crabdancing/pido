@@ -4,13 +4,15 @@
 #
 # Author: Cassie E Nicol cassieenicol@gmail.com
 #
+
+# Notes:
 # An Arch Linux Live CD can be downloaded here for testing
 # https://www.archlinux.org/download/
     
+BEGIN { unshift @INC, '.'; }
+
 use strict;
 use warnings;
-
-BEGIN { unshift @INC, '.'; }
 
 use Data::Dumper;
 
@@ -29,7 +31,7 @@ my $debug = undef;
 
 # Define the operations
 my %operations = (
-    'database|D' => \&database,
+    'database|D' => \&dat>abase,
     'query|Q'    => \&query,
     'remove|R'   => \&remove,
     'sync|S'     => \&sync,
@@ -37,18 +39,6 @@ my %operations = (
     'files|F'    => \&files,
     'version|V'  => \&version,
     'help'       => \&help,
-    );
-
-# Define the Operation Options (not used)
-my %operation_options = (
-    'database|D',
-    'query|Q',
-    'remove|R',
-    'sync|S',
-    'deptest|T',
-    'files|F',
-    'version|V',
-    'help',
     );
 
 # Define the Standard Options
@@ -99,10 +89,10 @@ my @query_options = (
 
 # Define Remove Options (apply to -R)
 my @remove_options = (
-'cascade|c',
-'nosave|n',
-'recursive|s',
-'unneeded|u',
+    'cascade|c',
+    'nosave|n',
+    'recursive|s',
+    'unneeded|u',
     );
 
 # Define the Sync Options
@@ -153,8 +143,10 @@ my @file_options = (
 #------------------------------------------------------------------------
 # Debug to show on console a bar of dashes when the app starts.
 
-print "------------------------------------------------------------------------------\n";
-print "$0 @ARGV\n";
+#if($debug) {
+    print "------------------------------------------------------------------------------\n";
+    print "$0 @ARGV\n";
+#}
 
 #------------------------------------------------------------------------
 # Save a copy of the command line
@@ -188,29 +180,29 @@ print "\@ARGV:\n", Dumper(\@ARGV) if($debug);
 # Get Options
 
 my $o = Getopt::Long::Parser->new;
-#$o->configure( 'no_ignore_case', 'bundling', 'pass_through', 'no_auto_abbrev' );
 $o->configure( 'no_ignore_case', 'bundling', 'no_auto_abbrev' );
 $o->getoptions(\%option_hash, @options);
 
-if(1) {
-    #print "option_hash:\n", Dumper(\%option_hash);
-    print Data::Dumper->Dump([\%option_hash], [qw(*option_hash)]);
-    print Data::Dumper->Dump([\@ARGV], ['*argv']);
-} else {
-    print("Options Found\n");
-    for my $key (keys %option_hash ) {
-	print("$key");
-	print(": $option_hash{$key}") if( defined $option_hash{$key} );
-	print("\n");
+if($debug) {
+    if(1) {
+	print Data::Dumper->Dump([\%option_hash], [qw(*option_hash)]);
+	print Data::Dumper->Dump([\@ARGV], ['*argv']);
+    } else {
+	print("Options Found\n");
+	for my $key (keys %option_hash ) {
+	    print("$key");
+	    print(": $option_hash{$key}") if( defined $option_hash{$key} );
+	    print("\n");
+	}
     }
 }
 
 #------------------------------------------------------------------------
 # Run operation
 
-&{$operation}();
+my $result = &{$operation}();
 
-exit(0);
+exit($result);
 
 #------------------------------------------------------------------------
 # Utility functions
