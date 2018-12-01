@@ -42,24 +42,28 @@ my %operations = (
     'help'       => \&help,
     );
 
+my $confirm = undef;
+
 # Define the Standard Options
 my @standard_options = (
     'dbpath|b=s',
     'verbose|v',
     'arch=s',
-    'cachedir=s',
+    'cachedir=s@',
     'color=s',
     'config',
     'debug',
     'gpgdir=s',
-    'hookdir=s',
+    'hookdir=s@',
     'logfile=s',
-    'noconfirm',
-    'confirm',
-    'disable_download_timeout',
+    'noconfirm' => sub { $confirm = undef; },
+    'confirm' => sub { $confirm = 1; },
+    'disable-download-timeout',
     'sysroot=s',
     'dry-run|n',
     );
+
+    # Fix confirm and noconfirm
 
 # Define Database Options
 my @database_options = (
@@ -98,12 +102,12 @@ my @remove_options = (
 
 # Define the Sync Options
 my @sync_options = (
-    'clean|c',
-    'groups|g',
-    'info|i',
+    'clean|c+',
+    'groups|g+',
+    'info|i+',
     'list|l',
     'quiet|q',
-    'search|s=s',
+    'search|s=s@',
     'sysupgrade|u',
     'downloadonly|w',
     'refresh|y+',
@@ -111,7 +115,7 @@ my @sync_options = (
 
 # Define Transaction Options (apply to -S, -R, and -U)
 my @transaction_options = (
-    'nodeps|d',
+    'nodeps|d+',
     'assume-installed=s',
     'dbonly',
     'noprogressbar',
@@ -184,6 +188,11 @@ my $o = Getopt::Long::Parser->new;
 $o->configure( 'no_ignore_case', 'bundling', 'no_auto_abbrev' );
 $o->getoptions(\%option_hash, @options) or die("trying");
 
+# --confirm and --noconfirm is a special case
+if( defined $confirm ) {
+  $option_hash{confirm} = $confirm;
+}
+   
 if($debug) {
     print "After option parse:\n";
     if(1) {
