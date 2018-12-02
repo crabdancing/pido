@@ -87,7 +87,7 @@ my @query_options = (
     'owns|o=s',
     'file|p',
     'quiet|q',
-    'search|s:s@',
+    'search|s',
     'unrequired|t',
     'upgrades|u',
     );
@@ -107,7 +107,7 @@ my @sync_options = (
     'info|i+',
     'list|l',
     'quiet|q',
-    'search|s:s@',
+    'search|s',
     'sysupgrade|u',
     'downloadonly|w',
     'refresh|y+',
